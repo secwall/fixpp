@@ -3,6 +3,7 @@
 from xml.dom import minidom
 import sys
 import os
+import re
 import argparse
 import appdirs
 import ConfigParser
@@ -54,6 +55,11 @@ def print_messages(args):
         log = sys.stdin
 
     for line in log:
+        if not args.separator:
+            # auto-detect separator using the sequence number field
+            # that should always be present
+            args.separator = re.search("([^0-9])34=", line).group(1)
+
         ret = []
         pairs = line.split(args.separator)[:-1]
         for pair in pairs:
@@ -93,7 +99,7 @@ def _main():
     parser.add_argument("-i", dest='input_file', required=False, help='Input file (stdin by default)')
     parser.add_argument("-l", nargs='?', const=True, default=False, dest='long_format', required=False, help='Use long format (separate line for every pair)')
     parser.add_argument("-n", action='store_true', default=False, dest='number', required=False, help='Show field numbers')
-    parser.add_argument("-s", default=chr(1), dest='separator', required=False, help='Use this separator instead of default')
+    parser.add_argument("-s", dest='separator', required=False, help='Use this separator instead of auto-detection')
     args = parser.parse_args()
 
     print_messages(args)
