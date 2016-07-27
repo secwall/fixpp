@@ -96,7 +96,7 @@ def print_messages(args):
 def _main():
     parser = argparse.ArgumentParser(description="FIX log pretty printer")
     parser.add_argument("-d", dest='dict_file', required=True, help='Dictionary file path')
-    parser.add_argument("-l", nargs='?', const=True, default=False, dest='long_format', required=False, help='Use long format (separate line for every pair)')
+    parser.add_argument("-l", action='store_true', default=False, dest='long_format', required=False, help='Use long format (separate line for every pair)')
     parser.add_argument("-n", action='store_true', default=False, dest='number', required=False, help='Show field numbers')
     parser.add_argument("-s", dest='separator', required=False, help='Use this separator instead of auto-detection')
     parser.add_argument("input_file", help='Input file (stdin by default)', nargs='?')
