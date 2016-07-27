@@ -59,16 +59,21 @@ def print_messages(args):
         for pair in pairs:
             try:
                 tag, value = pair.split('=')
-                tag_name = int_hashtable[tag]
-                value_name = value
+                tag_entry = int_hashtable[tag]
+                tag_name = str(tag_entry[0])
                 if args.number:
-                    tag_name[0] += "(" + tag + ")"
-                if tag_name[1]:
-                    value_name = tag_name[1][value]
+                    tag_name += "(" + tag + ")"
+                if tag_entry[1]:
+                    value_name = str(tag_entry[1][value])
                     if args.number:
                         value_name += "(" + value + ")" 
+                else:
+                    value_name = value
 
-                ret.append(tag_name[0] + "=" + value_name)
+                if args.long_format:
+                    ret.append("%30s: %s" % (tag_name, value_name))
+                else:
+                    ret.append("%s=%s" % (tag_name, value_name))
             except Exception:
                 ret.append(pair)
 
