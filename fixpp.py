@@ -95,10 +95,8 @@ def _main():
     parser.add_argument("-n", action='store_true', default=False, dest='number', required=False, help='Show field numbers')
     parser.add_argument("-s", default=chr(1), dest='separator', required=False, help='Use this separator instead of default')
     args = parser.parse_args()
-    try:
-        print_messages(args)
-    except Exception:
-        pass
+
+    print_messages(args)
 
 
 if __name__ == "__main__":
