@@ -1,0 +1,2 @@
+appdirs==1.4.0
+MultiMap==1.0.3
