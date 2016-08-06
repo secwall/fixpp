@@ -1,17 +1,23 @@
 #!/usr/bin/env python
 
-from xml.dom import minidom
-import sys
+from __future__ import absolute_import, print_function, unicode_literals
+
+import argparse
 import os
 import re
-import argparse
+import sys
+from xml.dom import minidom
+
 import appdirs
-import ConfigParser
 import multimap
+
+try:
+    from configparser import ConfigParser
+except:
+    from ConfigParser import SafeConfigParser as ConfigParser
 
 
 class TagExpression:
-
     def __init__(self, tag):
         self.tag = tag
 
@@ -20,7 +26,6 @@ class TagExpression:
 
 
 class TagEqualExpression:
-
     def __init__(self, tag, value):
         self.tag = tag
         self.value = value
@@ -30,7 +35,6 @@ class TagEqualExpression:
 
 
 class TagNotEqualExpression:
-
     def __init__(self, tag, value):
         self.tag = tag
         self.value = value
@@ -40,7 +44,6 @@ class TagNotEqualExpression:
 
 
 class OperatorAnd:
-
     def evaluate(self, msg_dict, stack, index):
 
         index -= 1
@@ -50,7 +53,6 @@ class OperatorAnd:
 
 
 class OperatorOr:
-
     def evaluate(self, msg_dict, stack, index):
 
         index -= 1
@@ -60,7 +62,6 @@ class OperatorOr:
 
 
 class OperatorNot:
-
     def evaluate(self, msg_dict, stack, index):
         index -= 1
         index, value = stack[index].evaluate(msg_dict, stack, index)
@@ -92,7 +93,6 @@ def parse_expression(expression, stack, index):
 
 
 def parse_and_expression(expression, stack, index):
-
     index = parse_simple_expression(expression, stack, index)
     while index < len(expression) and expression[index] == "&":
         index = parse_simple_expression(expression, stack, index + 1)
@@ -102,7 +102,6 @@ def parse_and_expression(expression, stack, index):
 
 
 def parse_simple_expression(expression, stack, index):
-
     strlen = len(expression)
     if index < strlen and expression[index] == "(":
         index = parse_expression(expression, stack, index + 1)
@@ -120,7 +119,6 @@ def parse_simple_expression(expression, stack, index):
 
 
 def parse_const_expression(expression, stack, index):
-
     index, tag = parse_number(expression, index)
     if expression[index:index + 2] == "!=":
         index, value = parse_value(expression, index + 2)
@@ -135,7 +133,6 @@ def parse_const_expression(expression, stack, index):
 
 
 def parse_number(expression, index):
-
     start = index
     strlen = len(expression)
     while index < strlen and expression[index].isdigit():
@@ -148,7 +145,6 @@ def parse_number(expression, index):
 
 
 def parse_value(expression, index):
-
     start = index
     strlen = len(expression)
     while index < strlen and expression[index] not in (')', '&', '|'):
@@ -158,7 +154,6 @@ def parse_value(expression, index):
 
 
 def get_expression_stack(expression):
-
     stack = []
     index = parse_expression(expression, stack, 0)
     if index != len(expression):
@@ -168,7 +163,6 @@ def get_expression_stack(expression):
 
 
 def eval_expression(filter_stack, msg_dict):
-
     index = len(filter_stack) - 1
     index, result = filter_stack[index].evaluate(msg_dict, filter_stack, index)
 
@@ -190,7 +184,7 @@ def parse_enums(xml_field):
 
 def parse_dict(dict_file):
     try:
-        config = ConfigParser.SafeConfigParser()
+        config = ConfigParser()
         user_config_dir = appdirs.user_config_dir('fixpp', 'secwall')
         config.read(os.path.join(user_config_dir, 'fixpp.conf'))
         xmldoc = minidom.parse(config.get("quicklink", dict_file))
@@ -215,7 +209,6 @@ def parse_dict(dict_file):
 
 
 def make_tag_value_list(line, separator):
-
     def make_pair(token):
         if len(token) == 1:
             token.append(None)
@@ -275,18 +268,18 @@ def print_messages(args):
 
         if ret:
             if args.long_format:
-                print " \n".join(ret)
-                print
+                print(" \n".join(ret))
+                print()
             else:
-                print ",".join(ret)
+                print(",".join(ret))
 
     if args.input_file:
         log.close()
 
 
 def _main():
-
-    usage = "%(prog)s [options] <file>\n" \
+    usage = "%(prog)s [-h] -d DICT_FILE [-l] [-n] [-e FILTER] " \
+        "[-s SEPARATOR] [input_file]\n" \
         "Expression can be used for filtering messages, syntax:\n" \
         "    expr = and_expr\n" \
         "         | and_expr '|' expr\n" \
